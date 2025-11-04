@@ -17,7 +17,7 @@ if __name__=='__main__':
     timestamp = args.timestamp
     try:
         model_version = f'model_{timestamp}_dt_model'  # Use a timestamp as the version
-        model = joblib.load(f'{model_version}.joblib')
+        model = joblib.load(f'models/{model_version}.joblib')
     except:
         raise ValueError('Failed to catching the latest model')
         
@@ -67,19 +67,14 @@ if __name__=='__main__':
     metrics = {"F1_Score":f1_score(y, y_predict)}
     
     # Save metrics to a JSON file
-    # Get the absolute path to ensure we're in the right directory
-    script_dir = os.path.dirname(os.path.abspath(__file__))
-    lab2_dir = os.path.dirname(script_dir)  # Go up from src/ to Lab2/
-    metrics_dir = os.path.join(lab2_dir, 'metrics')
+    # Create metrics directory if it doesn't exist
+    if not os.path.exists('metrics'): 
+        os.makedirs('metrics')
     
-    if not os.path.exists(metrics_dir): 
-        # then create it.
-        os.makedirs(metrics_dir)
-    
-    metrics_file_path = os.path.join(metrics_dir, f'{timestamp}_metrics.json')
-    with open(metrics_file_path, 'w') as metrics_file:
+    metrics_filename = f'metrics/{timestamp}_metrics.json'
+    with open(metrics_filename, 'w') as metrics_file:
         json.dump(metrics, metrics_file, indent=4)
     
-    print(f"Metrics saved to: {metrics_file_path}")
+    print(f"Metrics saved to: {metrics_filename}")
                
     

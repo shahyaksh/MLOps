@@ -57,19 +57,17 @@ jobs:
         fi
       continue-on-error: false  # Continue even if evaluation fails
 
-    - name: Store and Version the New Model
+    - name: Verify Model was Saved
       run: |
         timestamp=$(cat timestamp.txt)
-        model_filename="model_${timestamp}_dt_model.joblib"
-        # The model file is created in the current directory by train_model.py
-        mkdir -p models
-        if [ -f "$model_filename" ]; then
-          mv $model_filename models/$model_filename
-        else
+        model_filename="models/model_${timestamp}_dt_model.joblib"
+        # The model file is already saved to models/ directory by train_model.py
+        if [ ! -f "$model_filename" ]; then
           echo "Error: Model file not found: $model_filename"
-          ls -la *.joblib || echo "No joblib files found"
+          ls -la models/ || echo "Models directory does not exist"
           exit 1
         fi
+        echo "Model successfully saved to $model_filename"
 
     - name: Commit and Push Changes
       run: |
