@@ -17,6 +17,8 @@ google-cloud-sdk/
 *.so
 *.tar.gz
 *.json
+# Allow metrics JSON files to be tracked
+!Labs/Github_Labs/Lab2/metrics/*_metrics.json
 *.pdf
 
 # Distribution / packaging
