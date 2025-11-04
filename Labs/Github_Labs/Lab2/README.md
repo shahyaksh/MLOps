@@ -25,8 +25,17 @@ Watch the tutorial video for this lab at [Github action Lab2](https://youtu.be/c
 6. Git command-line tool (optional)
 
 # Running the Workflow
+## Dataset and Model
+This project uses the **SMS Spam Collection** dataset from the UCI Machine Learning Repository for spam classification. The dataset contains SMS messages labeled as either "spam" or "ham" (legitimate messages).
+
+The model uses:
+- **Dataset**: SMS Spam Collection (automatically downloaded on first run)
+- **Model**: Support Vector Classifier (SVC) with RBF kernel
+- **Text Processing**: TF-IDF vectorization with 5,000 features
+- **Task**: Binary classification (spam vs. ham)
+
 ## Customize Model Training
-1. Modify the `train_model.py` script in the `src/` directory according to your dataset and model requirements. This script generates synthetic data for demonstration purposes.
+1. Modify the `train_model.py` script in the `src/` directory according to your dataset and model requirements. The dataset is automatically downloaded from the UCI repository if not already present.
 
 ## Push Your Changes:
 1. Commit your changes and push them to your forked repository.
@@ -50,8 +59,13 @@ Each time you run the workflow, a new version of the model is created and stored
 The workflow consists of the following steps:
 
 - Generate and Store Timestamp: A timestamp is generated and stored in a file for versioning.
-- Model Training: The `train_model.py` script is executed, which trains a random forest classifier on synthetic data and stores the model in the `models/` directory.
-- Model Evaluation: The `evaluate_model.py` script is executed to evaluate the model's F1 Score on synthetic data, and the results are stored in the `metrics/` directory.
+- Model Training: The `train_model.py` script is executed, which:
+  - Downloads the SMS Spam Collection dataset (if not already present)
+  - Preprocesses text data using TF-IDF vectorization
+  - Trains a Support Vector Classifier (SVC) with RBF kernel on the spam classification dataset
+  - Splits data into training (80%) and testing (20%) sets
+  - Stores the trained model and vectorizer in the `models/` and `data/` directories respectively
+- Model Evaluation: The `evaluate_model.py` script is executed to evaluate the model's F1 Score on the spam dataset, and the results are stored in the `metrics/` directory.
 - Store and Version the New Model: The trained model is moved to the `models/` directory with a timestamp-based version.
 - Commit and Push Changes: The metrics and updated model are committed to the repository, allowing you to track changes.
 
@@ -92,9 +106,25 @@ This workflow is designed to work seamlessly with the main model training workfl
 # License
 This project is licensed under the MIT License - see the LICENSE file for details.
 
+# Dataset Information
+The SMS Spam Collection dataset is a public dataset containing 5,572 SMS messages labeled as spam or ham. The dataset is automatically downloaded from the UCI Machine Learning Repository on first run.
+
+**Dataset Source**: [UCI Machine Learning Repository - SMS Spam Collection](https://archive.ics.uci.edu/ml/datasets/sms+spam+collection)
+
+**Features**:
+- Text messages (SMS)
+- Binary labels: spam (1) or ham (0)
+
+**Preprocessing**:
+- Text messages are converted to numerical features using TF-IDF (Term Frequency-Inverse Document Frequency) vectorization
+- Maximum of 5,000 features are extracted
+- English stop words are removed during vectorization
+- The vectorizer is saved to ensure consistent feature representation between training and evaluation
+
 # Acknowledgments
 - This project uses GitHub Actions for continuous integration and deployment.
 - Model training and evaluation are powered by Python and scikit-learn.
+- Dataset: SMS Spam Collection from UCI Machine Learning Repository.
 
 # Questions or Issues
 If you have any questions or encounter issues while using this GitHub Actions workflow, please open an issue in the Issues section of your repository.
