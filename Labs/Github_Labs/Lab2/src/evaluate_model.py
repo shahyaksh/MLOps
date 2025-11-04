@@ -67,12 +67,19 @@ if __name__=='__main__':
     metrics = {"F1_Score":f1_score(y, y_predict)}
     
     # Save metrics to a JSON file
-
-    if not os.path.exists('metrics/'): 
+    # Get the absolute path to ensure we're in the right directory
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    lab2_dir = os.path.dirname(script_dir)  # Go up from src/ to Lab2/
+    metrics_dir = os.path.join(lab2_dir, 'metrics')
+    
+    if not os.path.exists(metrics_dir): 
         # then create it.
-        os.makedirs("metrics/")
-        
-    with open(f'metrics/{timestamp}_metrics.json', 'w') as metrics_file:
+        os.makedirs(metrics_dir)
+    
+    metrics_file_path = os.path.join(metrics_dir, f'{timestamp}_metrics.json')
+    with open(metrics_file_path, 'w') as metrics_file:
         json.dump(metrics, metrics_file, indent=4)
+    
+    print(f"Metrics saved to: {metrics_file_path}")
                
     

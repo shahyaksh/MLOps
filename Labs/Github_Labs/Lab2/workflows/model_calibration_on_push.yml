@@ -51,6 +51,9 @@ jobs:
         cd Labs/Github_Labs/Lab2
         timestamp=$(cat timestamp.txt) # Use the timestamp in your training script
         python ./src/evaluate_model.py  --timestamp "$timestamp" # Assuming you have a script for model evaluation
+        # Verify the metrics file was created
+        ls -la metrics/ || echo "Metrics directory not found"
+        ls -la metrics/${timestamp}_metrics.json || echo "Metrics file not found"
       continue-on-error: false  # Continue even if evaluation fails
 
     - name: Store and Version the New Model
@@ -67,6 +70,17 @@ jobs:
         timestamp=$(cat timestamp.txt)
         metrics_filename="${timestamp}_metrics.json"
         model_filename="model_${timestamp}_dt_model.joblib"
+        # Verify files exist before committing
+        if [ ! -f "metrics/$metrics_filename" ]; then
+          echo "Error: Metrics file not found: metrics/$metrics_filename"
+          ls -la metrics/ || echo "Metrics directory does not exist"
+          exit 1
+        fi
+        if [ ! -f "models/$model_filename" ]; then
+          echo "Error: Model file not found: models/$model_filename"
+          ls -la models/ || echo "Models directory does not exist"
+          exit 1
+        fi
         git config --global user.email "26876927+raminmohammadi@users.noreply.github.com"
         git config --global user.name "raminmohammadi"
         git add metrics/$metrics_filename models/$model_filename
