@@ -1,12 +1,5 @@
 # Using GitHub Actions for Model Training and Versioning
 
-
-## Prerequisites
-
-- [GitHub](https://github.com) account
-- Basic knowledge of Python and machine learning
-- Git command-line tool (optional)
-
 ## Getting Started
 
 1. **Fork this Repository**: Click the "Fork" button at the top right of this [repository](https://github.com/raminmohammadi/MLOps/) to create your own copy.
