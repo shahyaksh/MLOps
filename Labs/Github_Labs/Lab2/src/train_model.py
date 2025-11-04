@@ -56,7 +56,7 @@ if __name__ == '__main__':
     y = df['label'].values
     
     # Vectorize text data
-    vectorizer = TfidfVectorizer(max_features=5000, stop_words='english', random_state=0)
+    vectorizer = TfidfVectorizer(max_features=5000, stop_words='english')
     X = vectorizer.fit_transform(X_text).toarray()
     # Save data and vectorizer
     if not os.path.exists('data'): 
