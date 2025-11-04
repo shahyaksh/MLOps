@@ -39,26 +39,55 @@ jobs:
     - name: Retrain Model
       run: |
         timestamp=$(cat timestamp.txt) # Use the timestamp in your training script
-        python Labs/Github_Labs/Lab2/src/train_model.py --timestamp "$timestamp"
+        cd Labs/Github_Labs/Lab2
+        python ./src/train_model.py --timestamp "$timestamp"
 
     - name: Evaluate Model and Log Metrics
       run: |
         timestamp=$(cat timestamp.txt) # Use the timestamp in your training script
-        python Labs/Github_Labs/Lab2/src/evaluate_model.py  --timestamp "$timestamp" # Assuming you have a script for model evaluation
+        cd Labs/Github_Labs/Lab2
+        python ./src/evaluate_model.py  --timestamp "$timestamp" # Assuming you have a script for model evaluation
         metrics_filename="${timestamp}_metrics.json"
-        mv $metrics_filename Labs/Github_Labs/Lab2/metrics/$metrics_filename
+        # The metrics file is already created in the metrics/ directory by evaluate_model.py
+        # Verify the file exists (we're in Lab2 directory now)
+        if [ ! -f "metrics/$metrics_filename" ]; then
+          echo "Error: Metrics file not found: metrics/$metrics_filename"
+          ls -la metrics/ || echo "Metrics directory does not exist"
+          exit 1
+        fi
       continue-on-error: false  # Continue even if evaluation fails
 
-    - name: Store and Version the New Model
+    - name: Verify Model was Saved
       run: |
         timestamp=$(cat timestamp.txt)
         model_filename="model_${timestamp}_dt_model.joblib"
-        mv $model_filename Labs/Github_Labs/Lab2/models/$model_filename
+        cd Labs/Github_Labs/Lab2
+        # The model file is already saved to models/ directory by train_model.py
+        if [ ! -f "models/$model_filename" ]; then
+          echo "Error: Model file not found: models/$model_filename"
+          ls -la models/ || echo "Models directory does not exist"
+          exit 1
+        fi
+        echo "Model successfully saved to models/$model_filename"
 
     - name: Commit and Push Changes
       run: |
-        git config --global user.email "26876927+raminmohammadi@users.noreply.github.com"
-        git config --global user.name "raminmohammadi"
+        timestamp=$(cat timestamp.txt)
+        metrics_filename="${timestamp}_metrics.json"
+        model_filename="model_${timestamp}_dt_model.joblib"
+        # Verify files exist before committing
+        if [ ! -f "Labs/Github_Labs/Lab2/metrics/$metrics_filename" ]; then
+          echo "Error: Metrics file not found: Labs/Github_Labs/Lab2/metrics/$metrics_filename"
+          ls -la Labs/Github_Labs/Lab2/metrics/ || echo "Metrics directory does not exist"
+          exit 1
+        fi
+        if [ ! -f "Labs/Github_Labs/Lab2/models/$model_filename" ]; then
+          echo "Error: Model file not found: Labs/Github_Labs/Lab2/models/$model_filename"
+          ls -la Labs/Github_Labs/Lab2/models/ || echo "Models directory does not exist"
+          exit 1
+        fi
+        git config --global user.email "capcool79@gmail.com"
+        git config --global user.name "shahyaksh"
         git add Labs/Github_Labs/Lab2/metrics/$metrics_filename Labs/Github_Labs/Lab2/models/$model_filename
         git commit -m "Add metrics and updated model"
         git push
