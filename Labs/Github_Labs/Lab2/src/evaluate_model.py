@@ -72,7 +72,7 @@ if __name__=='__main__':
         # then create it.
         os.makedirs("metrics/")
         
-    with open(f'{timestamp}_metrics.json', 'w') as metrics_file:
+    with open(f'metrics/{timestamp}_metrics.json', 'w') as metrics_file:
         json.dump(metrics, metrics_file, indent=4)
                
     
