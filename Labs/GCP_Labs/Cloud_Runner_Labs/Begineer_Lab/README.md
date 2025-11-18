@@ -1,124 +1,270 @@
-# Cloud Runner Basic Lab
+# Cloud Run Flask Application
 
-Welcome to the beginners lab on Google Cloud Run! In this lab, you will learn to deploy a containerized application on Google Cloud Run, monitor its performance, and scale it based on traffic needs.
+A simple Flask application designed to be deployed on Google Cloud Run. This application demonstrates basic REST API endpoints and serves as a beginner-friendly example for Cloud Run deployment.
 
----
+## Features
 
-## Step-by-Step Guide
+- Simple Flask web application
+- Multiple REST API endpoints for testing
+- Health check endpoint for monitoring
+- Containerized with Docker
+- Ready for Cloud Run deployment
 
-### Step 1: Set Up Google Cloud Project
+## API Endpoints
 
-1. **Create a Google Cloud Project**:
-   - Go to the [Google Cloud Console](https://console.cloud.google.com/).
-   - Create a new project and give it a meaningful name (e.g., `cloud_runner_lab`).
+### 1. Root Endpoint
+- **URL**: `/`
+- **Method**: `GET`
+- **Description**: Returns a simple "Hello, World!" message
+- **Response**: `"Hello, World!"`
 
-2. **Enable Necessary APIs**:
-   - In the Console, navigate to `APIs & Services > Library`.
-   - Enable the **Cloud Run API** and the **Container Registry API**.
+### 2. Health Check
+- **URL**: `/health`
+- **Method**: `GET`
+- **Description**: Health check endpoint for Cloud Run monitoring
+- **Response**:
+  ```json
+  {
+    "status": "healthy",
+    "timestamp": "2025-01-XX...",
+    "service": "Cloud Run Flask App"
+  }
+  ```
 
----
+### 3. API Information
+- **URL**: `/api/info`
+- **Method**: `GET`
+- **Description**: Returns information about all available endpoints
+- **Response**:
+  ```json
+  {
+    "message": "This is a test endpoint for Cloud Run",
+    "endpoints": {
+      "/": "Hello World endpoint",
+      "/health": "Health check endpoint",
+      "/api/info": "API information endpoint"
+    },
+    "deployment": "Cloud Run",
+    "timestamp": "2025-01-XX..."
+  }
+  ```
 
-### Step 2: Create and Containerize the Application
+### 4. Test Endpoint
+- **URL**: `/api/test`
+- **Method**: `GET`
+- **Description**: Simple test endpoint to verify Cloud Run functionality
+- **Response**:
+  ```json
+  {
+    "success": true,
+    "message": "Cloud Run test endpoint is working!",
+    "data": {
+      "test_id": "test_001",
+      "status": "active"
+    }
+  }
+  ```
 
-1. **Create a Simple Flask Application**:
-   - Write a basic Flask application in Python to use as your project.
-   - Example `app.py`:
-     ```python
-     from flask import Flask
+## Prerequisites
 
-     app = Flask(__name__)
+- Python 3.8 or higher
+- Docker (for containerization)
+- Google Cloud SDK (`gcloud`) installed and configured
+- A Google Cloud Project with Cloud Run API enabled
 
-     @app.route('/')
-     def hello_world():
-         return "Hello, World!"
+## Local Development
 
-     if __name__ == "__main__":
-         app.run(host="0.0.0.0", port=8080)
-     ```
+### 1. Install Dependencies
 
-2. **Create a Dockerfile**:
-   - In the same directory as your Flask app, create a Dockerfile to containerize the application.
-   - Example Dockerfile:
-     ```Dockerfile
-     FROM python:3.8-slim
+```bash
+pip install flask
+```
 
-     WORKDIR /app
-     COPY . /app
-     RUN pip install flask
+### 2. Run the Application Locally
 
-     EXPOSE 8080
-     CMD ["python", "app.py"]
-     ```
+```bash
+python app.py
+```
 
-3. **Build the Docker Image**:
-   - Ensure Docker is running on your local machine.
-   - In the terminal, navigate to the app’s directory and build the Docker image:
-     ```bash
-     docker build -t gcr.io/YOUR_PROJECT_ID/hello-world .
-     ```
+The application will be available at `http://localhost:8080`
 
----
+### 3. Test Endpoints Locally
 
-### Step 3: Push the Docker Image to Container Registry
+```bash
+# Test root endpoint
+curl http://localhost:8080/
 
-1. **Authenticate with Google Cloud**:
-   - Set up authentication with Google Cloud using the following command:
-     ```bash
-     gcloud auth configure-docker
-     ```
+# Test health check
+curl http://localhost:8080/health
 
-2. **Push the Docker Image**:
-   - Tag and push your Docker image to the Container Registry:
-     ```bash
-     docker tag gcr.io/YOUR_PROJECT_ID/hello-world gcr.io/YOUR_PROJECT_ID/hello-world
-     docker push gcr.io/YOUR_PROJECT_ID/hello-world
-     ```
+# Test API info
+curl http://localhost:8080/api/info
 
----
+# Test endpoint
+curl http://localhost:8080/api/test
+```
 
-### Step 4: Deploy to Google Cloud Run
+## Docker Build and Test
 
-1. **Navigate to Cloud Run in Google Console**:
-   - Go to the **Cloud Run** service in the Google Cloud Console.
-   - Click **Create Service**.
+### Build Docker Image
 
-2. **Configure the Deployment**:
-   - Select **Deploy a container image** and choose the image you pushed to the Container Registry.
-   - Set the **Region** (e.g., `us-central1`) and provide a **Service name**.
-   - For **Authentication**, select "Allow unauthenticated invocations" if you want the app to be publicly accessible.
+```bash
+docker build -t cloud-run-flask-app .
+```
 
-3. **Deploy the Application**:
-   - Click **Create** to deploy the service. This process may take a few minutes.
-   - Once deployed, Cloud Run will provide a URL for your application.
+### Run Docker Container Locally
 
----
+```bash
+docker run -p 8080:8080 cloud-run-flask-app
+```
 
-### Step 5: Access and Test the Application
+## Deployment to Google Cloud Run
 
-- **Access the URL** provided by Cloud Run to test your application.
-- You should see the message "Hello, World!" displayed if everything is working correctly.
+### Step 1: Authenticate and Configure Google Cloud
 
----
+1. **Initialize gcloud** (if not already done):
+   ```bash
+   gcloud init
+   ```
+   - Select your Google account
+   - Choose your Google Cloud project (or create a new one)
+   - Optionally set default Compute Engine region/zone
 
-### Step 6: Monitor and Scale the Service
+2. **Verify your configuration**:
+   ```bash
+   gcloud config list
+   ```
 
-1. **Monitor Metrics**:
-   - Use the Cloud Run Console to monitor various metrics such as request count, response latency, and memory usage.
-   - These metrics help you understand traffic and performance patterns.
+3. **Enable required APIs** (if not already enabled):
+   ```bash
+   gcloud services enable run.googleapis.com
+   gcloud services enable cloudbuild.googleapis.com
+   ```
 
-2. **Auto-Scaling**:
-   - Cloud Run automatically scales your service based on incoming traffic.
-   - You can configure the minimum and maximum number of instances if needed to control scaling.
+### Step 2: Deploy to Cloud Run (Simplified Method)
 
----
+The easiest way to deploy is using `gcloud run deploy --source .` which automatically builds and deploys your application:
 
-## Conclusion
+```bash
+gcloud run deploy --source .
+```
 
-Congratulations on completing the Cloud Runner Basic Lab! In this lab, you:
+**During the deployment process, you'll be prompted for:**
+- **Service name**: Enter a name for your service (e.g., `first-flask-app`)
+- **Region**: Select a region (e.g., `us-east4`, `us-central1`, etc.)
+- **Allow unauthenticated invocations**: Type `y` to make the service publicly accessible
 
-- Set up a Google Cloud project and enabled necessary APIs.
-- Created and containerized a Flask application.
-- Deployed it to Google Cloud Run and accessed it via a public URL.
-- Monitored and scaled the service based on demand.
+**Example output:**
+```
+Service name (begineerlab): first-flask-app
+Please specify a region: [select from list]
+Allow unauthenticated invocations to [first-flask-app] (y/N)? y
 
-This lab provided a foundational understanding of Google Cloud Run and how to deploy containerized applications in a serverless environment. Enjoy exploring more with Google Cloud!
+Building using Dockerfile and deploying container to Cloud Run service...
+✓ Building and deploying new service... Done.
+Service URL: https://first-flask-app-XXXXX.us-east4.run.app
+```
+
+**Note**: The first time you deploy, Cloud Run will automatically create an Artifact Registry repository named `cloud-run-source-deploy` in your selected region to store the built container.
+
+### Alternative: Manual Docker Build and Deploy
+
+If you prefer to build and push the Docker image manually:
+
+1. **Authenticate Docker with Google Cloud**:
+   ```bash
+   gcloud auth configure-docker
+   ```
+
+2. **Set your project ID**:
+   ```bash
+   gcloud config set project YOUR_PROJECT_ID
+   ```
+
+3. **Build and push the Docker image**:
+   ```bash
+   docker build -t gcr.io/YOUR_PROJECT_ID/cloud-run-flask-app .
+   docker push gcr.io/YOUR_PROJECT_ID/cloud-run-flask-app
+   ```
+
+4. **Deploy using the image**:
+   ```bash
+   gcloud run deploy cloud-run-flask-app \
+     --image gcr.io/YOUR_PROJECT_ID/cloud-run-flask-app \
+     --platform managed \
+     --region us-east4 \
+     --allow-unauthenticated \
+     --port 8080
+   ```
+
+### Step 3: Test the Deployed Application
+
+Once deployed, Cloud Run will provide a service URL in the format:
+`https://SERVICE_NAME-PROJECT_NUMBER.REGION.run.app`
+
+**Example**: `https://first-flask-app-66725207998.us-east4.run.app`
+
+Test all the endpoints:
+
+```bash
+# Replace with your actual Cloud Run service URL
+SERVICE_URL="https://first-flask-app-66725207998.us-east4.run.app"
+
+# Test root endpoint
+curl $SERVICE_URL/
+
+# Test health check
+curl $SERVICE_URL/health
+
+# Test API info
+curl $SERVICE_URL/api/info
+
+# Test endpoint
+curl $SERVICE_URL/api/test
+```
+
+Or test directly in your browser by visiting the URLs:
+- `https://YOUR_SERVICE_URL/`
+- `https://YOUR_SERVICE_URL/health`
+- `https://YOUR_SERVICE_URL/api/info`
+- `https://YOUR_SERVICE_URL/api/test`
+
+## Project Structure
+
+```
+Begineer_Lab/
+├── app.py          # Flask application with all endpoints
+├── Dockerfile      # Docker configuration for containerization
+└── README.md       # This file
+```
+
+## Configuration
+
+The application runs on:
+- **Host**: `0.0.0.0` (required for Cloud Run)
+- **Port**: `8080` (Cloud Run default)
+
+## Monitoring
+
+After deployment, you can monitor your Cloud Run service:
+- View metrics in the Cloud Run Console
+- Check request logs in Cloud Logging
+- Monitor performance metrics (latency, request count, memory usage)
+
+## Auto-Scaling
+
+Cloud Run automatically scales your service based on incoming traffic:
+- Scales to zero when there's no traffic
+- Scales up automatically when traffic increases
+- Configure min/max instances in the Cloud Run settings if needed
+
+## Troubleshooting
+
+- **Port 8080**: Ensure your app listens on port 8080 (Cloud Run requirement)
+- **Host 0.0.0.0**: The app must bind to `0.0.0.0`, not `127.0.0.1`
+- **Health Checks**: Use the `/health` endpoint for Cloud Run health checks
+- **Logs**: Check Cloud Logging for any runtime errors
+
+## License
+
+This is a learning project for MLOps coursework.
