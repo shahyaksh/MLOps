@@ -167,35 +167,6 @@ Service URL: https://first-flask-app-XXXXX.us-east4.run.app
 
 **Note**: The first time you deploy, Cloud Run will automatically create an Artifact Registry repository named `cloud-run-source-deploy` in your selected region to store the built container.
 
-### Alternative: Manual Docker Build and Deploy
-
-If you prefer to build and push the Docker image manually:
-
-1. **Authenticate Docker with Google Cloud**:
-   ```bash
-   gcloud auth configure-docker
-   ```
-
-2. **Set your project ID**:
-   ```bash
-   gcloud config set project YOUR_PROJECT_ID
-   ```
-
-3. **Build and push the Docker image**:
-   ```bash
-   docker build -t gcr.io/YOUR_PROJECT_ID/cloud-run-flask-app .
-   docker push gcr.io/YOUR_PROJECT_ID/cloud-run-flask-app
-   ```
-
-4. **Deploy using the image**:
-   ```bash
-   gcloud run deploy cloud-run-flask-app \
-     --image gcr.io/YOUR_PROJECT_ID/cloud-run-flask-app \
-     --platform managed \
-     --region us-east4 \
-     --allow-unauthenticated \
-     --port 8080
-   ```
 
 ### Step 3: Test the Deployed Application
 
